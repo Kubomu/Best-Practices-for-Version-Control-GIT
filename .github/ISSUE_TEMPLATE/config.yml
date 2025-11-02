@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/Kubomu/Best-Practices-for-Version-Control-GIT/discussions
+    about: For general discussions, Q&A, and community interaction
+  - name: 📚 Documentation
+    url: https://github.com/Kubomu/Best-Practices-for-Version-Control-GIT#readme
+    about: Browse the complete Git best practices documentation
+  - name: ❓ FAQ
+    url: https://github.com/Kubomu/Best-Practices-for-Version-Control-GIT/blob/main/faq.md
+    about: Check frequently asked questions first
+  - name: 🆘 Troubleshooting Guide
+    url: https://github.com/Kubomu/Best-Practices-for-Version-Control-GIT/blob/main/troubleshooting-guide.md
+    about: Solutions to common Git problems
