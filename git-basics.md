@@ -19,3 +19,53 @@ Git is a distributed version control system that helps you track changes in your
 ## Helpful Tips:
 - Always check the status with `git status` before committing.
 - Keep commits small and focused on a single change or feature.
+
+## Try It Yourself
+
+Practice these basic Git commands in a test repository:
+
+```bash
+# Create a practice directory
+mkdir git-practice
+cd git-practice
+
+# Initialize repository
+git init
+
+# Create a file and make first commit
+echo "Hello Git" >> readme.txt
+git status  # See untracked file
+git add readme.txt
+git status  # See staged file
+git commit -m "Add readme file"
+
+# Make more changes
+echo "Learning Git basics" >> readme.txt
+git status  # See modified file
+git add readme.txt
+git commit -m "Update readme"
+
+# View your work
+git log
+git log --oneline
+
+# Practice branching
+git branch feature-test
+git checkout feature-test
+# Or in one command: git checkout -b feature-test
+
+echo "Feature work" >> feature.txt
+git add feature.txt
+git commit -m "Add feature file"
+
+# Switch back to main
+git checkout main
+git log --oneline --all --graph
+```
+
+## Next Steps
+
+Once comfortable with basics, explore:
+- [Branching Strategies](branching-strategies.md) - Learn effective branching
+- [Commit Message Best Practices](commit-message-best-practices.md) - Write better commits
+- [Git Workflows](git-workflows.md) - Team collaboration patterns
