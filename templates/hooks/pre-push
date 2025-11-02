@@ -1,0 +1,64 @@
+#!/bin/bash
+# Pre-push hook example
+# Copy to .git/hooks/pre-push and make executable: chmod +x .git/hooks/pre-push
+
+protected_branches=("main" "master" "production")
+current_branch=$(git symbolic-ref --short HEAD)
+
+echo "Running pre-push checks..."
+
+# Prevent direct push to protected branches
+for branch in "${protected_branches[@]}"; do
+    if [ "$current_branch" = "$branch" ]; then
+        echo "❌ Error: Direct push to '$branch' is not allowed!"
+        echo "Please create a feature branch and submit a pull request."
+        echo ""
+        echo "To create a feature branch:"
+        echo "  git checkout -b feature/my-feature"
+        echo ""
+        exit 1
+    fi
+done
+
+# Run tests (uncomment and adjust for your project)
+# echo "Running tests..."
+# npm test || { echo "❌ Tests failed"; exit 1; }
+# python -m pytest || { echo "❌ Tests failed"; exit 1; }
+# go test ./... || { echo "❌ Tests failed"; exit 1; }
+
+# Check for commits with secrets (basic check)
+if git log @{u}.. --all --grep -E '(password|secret|api[_-]?key)' -i; then
+    echo "⚠️  Warning: Found commits mentioning passwords/secrets"
+    echo "Please review before pushing"
+    read -p "Continue anyway? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
+# Warn about force push
+while read local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" = "0000000000000000000000000000000000000000" ]; then
+        # Branch deletion
+        echo "⚠️  Deleting remote branch: $remote_ref"
+    elif [ "$remote_sha" = "0000000000000000000000000000000000000000" ]; then
+        # New branch
+        echo "✓ Pushing new branch: $remote_ref"
+    else
+        # Check if force push
+        if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+            echo "⚠️  WARNING: This appears to be a force push!"
+            echo "Branch: $remote_ref"
+            read -p "Are you sure you want to force push? (y/N): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                echo "❌ Push cancelled"
+                exit 1
+            fi
+        fi
+    fi
+done
+
+echo "✅ Pre-push checks passed!"
+exit 0

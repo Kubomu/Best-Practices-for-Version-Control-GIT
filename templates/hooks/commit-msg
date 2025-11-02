@@ -1,0 +1,56 @@
+#!/bin/bash
+# Commit message hook example
+# Copy to .git/hooks/commit-msg and make executable: chmod +x .git/hooks/commit-msg
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Check if message is empty
+if [ -z "$commit_msg" ]; then
+    echo "❌ Error: Commit message cannot be empty"
+    exit 1
+fi
+
+# Check for conventional commit format (optional - uncomment to enforce)
+# if ! echo "$commit_msg" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .{1,}$'; then
+#     echo "❌ Error: Commit message doesn't follow conventional commits format"
+#     echo "Format: <type>(scope): <description>"
+#     echo "Types: feat, fix, docs, style, refactor, test, chore"
+#     echo ""
+#     echo "Examples:"
+#     echo "  feat(auth): add login functionality"
+#     echo "  fix(api): resolve timeout issue"
+#     echo "  docs: update README"
+#     exit 1
+# fi
+
+# Check minimum length
+if [ ${#commit_msg} -lt 10 ]; then
+    echo "❌ Error: Commit message too short (minimum 10 characters)"
+    echo "Current: ${#commit_msg} characters"
+    exit 1
+fi
+
+# Check for WIP commits in main branch
+current_branch=$(git symbolic-ref --short HEAD)
+if [ "$current_branch" = "main" ] || [ "$current_branch" = "master" ]; then
+    if echo "$commit_msg" | grep -qiE '(wip|work in progress|temp|temporary)'; then
+        echo "❌ Error: WIP commits not allowed on $current_branch branch"
+        exit 1
+    fi
+fi
+
+# Warn about long subject lines
+subject_line=$(echo "$commit_msg" | head -n1)
+if [ ${#subject_line} -gt 50 ]; then
+    echo "⚠️  Warning: Subject line exceeds 50 characters (${#subject_line})"
+    echo "Consider keeping it concise"
+fi
+
+# Check for issue reference (optional warning)
+if ! echo "$commit_msg" | grep -qE '#[0-9]+'; then
+    echo "ℹ️  Info: Consider referencing an issue number (#123)"
+fi
+
+echo "✅ Commit message checks passed!"
+exit 0
